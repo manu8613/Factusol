@@ -1,0 +1,17 @@
+{
+  "domain": "factusol",
+  "name": "Factusol",
+  "after_dependencies": [
+    "recorder"
+  ],
+  "codeowners": [
+    "@manu8613"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/manu8613/Factusol",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/manu8613/Factusol/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}
