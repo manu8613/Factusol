@@ -1,6 +1,6 @@
 # Estado
 
-Versión: v0.1.1 (rama `feat/v0.1.1`, en PR) · Publicada: v0.1.0 (`a6036d5`) · Actualizado: 2026-11-11
+Versión: v0.1.2 (rama `feat/icono`, en PR) · Publicada: v0.1.1 (`ae32d87`) · Actualizado: 2026-11-11
 
 ## Funciona (comprobado)
 - Motor de facturación 2.0TD: reproduce al céntimo dos facturas reales de autoconsumo con hucha (importe a pagar, ingreso en la hucha y saldo).
@@ -31,3 +31,12 @@ Versión: v0.1.1 (rama `feat/v0.1.1`, en PR) · Publicada: v0.1.0 (`a6036d5`) ·
 - Pruebas: 40 en verde (HA 2026.10.4, Python 3.14) + prueba con CSV reales fuera del repo.
 - Resultado verificado: agosto y septiembre cuadran al céntimo con sus facturas.
 - Pendientes: ver arriba. Próximo paso: configurarla en la instalación real y migrar las plantillas actuales.
+
+## Último cierre
+**Factusol · feat/icono · v0.1.2**
+- Objetivo: icono y logo propios, creativos, de facturación solar.
+- Cambios: `custom_components/factusol/brand/` con `icon.png` (256), `icon@2x.png` (512), `logo.png` y `logo@2x.png`; prueba que comprueba tamaños; CHANGELOG y manifest.
+- Verificado: imágenes revisadas a ojo; pytest y ruff en local.
+- Pendientes: ver el icono en la instalación real tras actualizar y reiniciar (Home Assistant 2026.3 o posterior).
+- Próximo paso: fusionar y actualizar desde HACS.
+
