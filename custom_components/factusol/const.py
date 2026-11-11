@@ -79,6 +79,7 @@ DEFAULT_CYCLE_DAY: Final = 1
 
 TICK: Final = timedelta(seconds=30)
 STORAGE_VERSION: Final = 1
+MAX_CSV_CHARS: Final = 8_000_000  # un año de CSV horario ocupa menos de 1 MB
 MAX_GAP_HOURS: Final = 24 * 14  # un hueco mayor se reparte igualmente, pero se avisa
 
 # Claves de los valores que se ajustan desde entidades number

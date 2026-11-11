@@ -36,6 +36,7 @@ from .const import (
     KEY_FACTOR_IMP,
     KEY_OFFSET_EXP,
     KEY_OFFSET_IMP,
+    MAX_CSV_CHARS,
     STORAGE_VERSION,
     T_FROM,
     TARIFF_FIELDS,
@@ -422,9 +423,16 @@ class FactusolManager(DataUpdateCoordinator[Snapshot]):
                 out["desviacion_total_bruto"] = round(float(estimate.bill.total_bruto) - float(real), 2)
         return out
 
-    async def async_import_official(self, path: str) -> dict[str, Any]:
-        """Importa un CSV del contador oficial a las horas del libro."""
-        text = await self.hass.async_add_executor_job(self._read_allowed, path)
+    async def async_import_official(self, path: str | None = None, content: str | None = None) -> dict[str, Any]:
+        """Importa un CSV del contador oficial a las horas del libro (desde un fichero o su contenido)."""
+        if content is not None:
+            if len(content) > MAX_CSV_CHARS:
+                raise HomeAssistantError("El CSV es demasiado grande")
+            text = content
+        elif path:
+            text = await self.hass.async_add_executor_job(self._read_allowed, path)
+        else:
+            raise HomeAssistantError("Indica la ruta o el contenido del CSV")
         try:
             hours = parse_csv(text, self.tz)
         except CsvFormatError as err:

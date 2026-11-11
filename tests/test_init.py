@@ -8,6 +8,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
+import voluptuous as vol
 
 pytest.importorskip("pytest_homeassistant_custom_component")
 
@@ -189,6 +190,34 @@ async def test_import_official_csv_and_cycle_counts(hass: HomeAssistant) -> None
     assert _sensor(hass, entry, "ultimo_dato_oficial").state not in ("unknown", "unavailable")
     factura = _sensor(hass, entry, "factura_estimada")
     assert factura.attributes["horas_oficiales"] == 23
+
+
+async def test_import_official_csv_from_content(hass: HomeAssistant) -> None:
+    entry = await _setup(hass)
+    name = _write_csv(hass, "temporal.csv")
+    text = (Path(hass.config.path(DOMAIN)) / name).read_text(encoding="utf-8")
+    result = await hass.services.async_call(
+        DOMAIN, "importar_datos_distribuidora", {"contenido": text}, blocking=True, return_response=True
+    )
+    assert result["horas"] == 23
+    assert _sensor(hass, entry, "factura_estimada").attributes["horas_oficiales"] == 23
+
+
+async def test_import_needs_exactly_one_source(hass: HomeAssistant) -> None:
+    await _setup(hass)
+    for data in ({}, {"ruta": "a.csv", "contenido": "x"}):
+        with pytest.raises(vol.Invalid):
+            await hass.services.async_call(DOMAIN, "importar_datos_distribuidora", data, blocking=True)
+
+
+async def test_import_rejects_unknown_or_huge_content(hass: HomeAssistant) -> None:
+    await _setup(hass)
+    with pytest.raises(HomeAssistantError):
+        await hass.services.async_call(DOMAIN, "importar_datos_distribuidora", {"contenido": "a;b\n1;2"}, blocking=True)
+    with pytest.raises(HomeAssistantError):
+        await hass.services.async_call(
+            DOMAIN, "importar_datos_distribuidora", {"contenido": "x" * 8_000_001}, blocking=True
+        )
 
 
 @pytest.mark.parametrize("ruta", ["/etc/passwd", "../configuration.yaml", "no_existe.csv"])

@@ -2,6 +2,9 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiones: [SemVer](https://semver.org/lang/es/).
 
+## [0.1.1] - 2026-11-11
+- `importar_datos_distribuidora` acepta el texto del CSV en `contenido` como alternativa a `ruta`, para cargar los datos de la distribuidora desde un script sin copiar ficheros a Home Assistant (máximo 8 MB; se indica una de las dos opciones).
+
 ## [0.1.0] - 2026-11-11
 - Primera versión: factura de luz 2.0TD calculada como la real, con neteo horario consumo/excedente, compensación de excedentes limitada por el coste de la energía, hucha de excedentes (saldo en euros) y coste real del ciclo.
 - Medida propia por horas a partir de tus sensores de energía (importación y exportación), con recuperación de huecos y reconstrucción desde las estadísticas de Home Assistant.
