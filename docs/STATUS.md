@@ -1,6 +1,6 @@
 # Estado
 
-Versión: v0.2.0 (rama `feat/factura-pdf`, en PR) · Publicada: v0.1.2 (`3f47b3a`) · Actualizado: 2026-11-11
+Versión: v0.2.1 (rama `fix/historial-facturas`, en PR) · Publicada: v0.2.0 · Actualizado: 2026-11-11
 
 ## Funciona (comprobado)
 - Motor de facturación 2.0TD: reproduce al céntimo dos facturas reales de autoconsumo con hucha (importe a pagar, ingreso en la hucha y saldo).

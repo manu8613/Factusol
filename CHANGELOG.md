@@ -2,6 +2,9 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiones: [SemVer](https://semver.org/lang/es/).
 
+## [0.2.1] - 2026-11-11
+- El historial de facturas incluye también las facturas registradas anteriores al saldo inicial de la hucha (antes se guardaban pero no se veían).
+
 ## [0.2.0] - 2026-11-11
 - Nuevo servicio `importar_factura_pdf`: lee una factura de luz en PDF (formato con hucha de excedentes) recibida en base64, extrae el periodo, los kWh por tramo, los excedentes, el total, la hucha aplicada, el ingreso y el saldo, y la registra. El PDF solo vive en memoria durante la llamada: no se guarda y del texto solo se conservan cifras. Comprueba que las cifras cuadran entre sí y, si los precios de la factura difieren de los guardados, crea una tarifa nueva desde el primer día del periodo (`actualizar_tarifa`).
 - Los ciclos pueden seguir los días reales de cada factura: `registrar_factura` admite `fecha_inicio`, y el ciclo dura exactamente lo que cobró la factura; el siguiente empieza al día siguiente.
