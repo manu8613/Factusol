@@ -1,0 +1,418 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Factusol: origen de los datos",
+        "description": "Calcula tu factura de luz 2.0TD con neteo horario, igual que la comercializadora.",
+        "data": {
+          "import_entity": "Energía importada de la red",
+          "export_entity": "Energía exportada a la red",
+          "cycle_day": "Día en que empieza el ciclo de facturación",
+          "extra_holidays": "Festivos extra (DD/MM, separados por comas)",
+          "name": "Nombre"
+        },
+        "data_description": {
+          "import_entity": "Sensor de energía acumulada (kWh, Wh) de tu pinza o medidor: lo que compras a la red.",
+          "export_entity": "Lo que viertes a la red. Opcional si no tienes solar.",
+          "cycle_day": "1 si facturas por meses naturales.",
+          "extra_holidays": "Los festivos nacionales de fecha fija ya van incluidos. Pon aquí otros que tu distribuidora cuente como valle."
+        }
+      },
+      "precios": {
+        "title": "Precios de tu contrato",
+        "description": "Copia los precios de tu factura. Impuestos aparte, en el siguiente paso.",
+        "data": {
+          "potencia_punta_kw": "Potencia contratada punta",
+          "potencia_valle_kw": "Potencia contratada valle",
+          "precio_potencia_punta": "Precio potencia punta",
+          "precio_potencia_valle": "Precio potencia valle",
+          "precio_punta": "Energía punta",
+          "precio_llano": "Energía llano",
+          "precio_valle": "Energía valle",
+          "precio_excedentes": "Compensación de excedentes"
+        }
+      },
+      "cargos": {
+        "title": "Cargos e impuestos",
+        "data": {
+          "bono_social_dia": "Financiación del bono social",
+          "alquiler_dia": "Alquiler de equipos de medida",
+          "otros_dia": "Otros servicios por día",
+          "otros_mes": "Otros servicios por ciclo",
+          "impuesto_electrico": "Impuesto sobre la electricidad",
+          "impuesto_minimo_mwh": "Mínimo del impuesto eléctrico",
+          "iva": "IVA"
+        }
+      },
+      "hucha": {
+        "title": "Hucha de excedentes",
+        "description": "Saldo en euros que la comercializadora guarda de tus excedentes y descuenta en facturas futuras.",
+        "data": {
+          "hucha_enabled": "Tengo hucha de excedentes",
+          "hucha_balance": "Saldo de la hucha",
+          "hucha_date": "Saldo a fecha de"
+        },
+        "data_description": {
+          "hucha_balance": "El de tu última factura.",
+          "hucha_date": "Último día del periodo de esa factura."
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Este sensor de importación ya está configurado."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opciones de Factusol",
+        "menu_options": {
+          "fuentes": "Origen de los datos y ciclo",
+          "precios": "Precios (tarifa vigente)",
+          "cargos": "Cargos e impuestos (tarifa vigente)",
+          "hucha": "Hucha de excedentes"
+        }
+      },
+      "fuentes": {
+        "title": "Origen de los datos y ciclo",
+        "data": {
+          "import_entity": "Energía importada de la red",
+          "export_entity": "Energía exportada a la red",
+          "cycle_day": "Día en que empieza el ciclo de facturación",
+          "extra_holidays": "Festivos extra (DD/MM, separados por comas)"
+        },
+        "data_description": {
+          "import_entity": "Sensor de energía acumulada (kWh, Wh) de tu pinza o medidor: lo que compras a la red.",
+          "export_entity": "Lo que viertes a la red. Opcional si no tienes solar.",
+          "cycle_day": "1 si facturas por meses naturales.",
+          "extra_holidays": "Los festivos nacionales de fecha fija ya van incluidos. Pon aquí otros que tu distribuidora cuente como valle."
+        }
+      },
+      "precios": {
+        "title": "Precios de la tarifa vigente",
+        "description": "Para un cambio de precios con fecha, usa el servicio nueva_tarifa.",
+        "data": {
+          "potencia_punta_kw": "Potencia contratada punta",
+          "potencia_valle_kw": "Potencia contratada valle",
+          "precio_potencia_punta": "Precio potencia punta",
+          "precio_potencia_valle": "Precio potencia valle",
+          "precio_punta": "Energía punta",
+          "precio_llano": "Energía llano",
+          "precio_valle": "Energía valle",
+          "precio_excedentes": "Compensación de excedentes"
+        }
+      },
+      "cargos": {
+        "title": "Cargos e impuestos de la tarifa vigente",
+        "data": {
+          "bono_social_dia": "Financiación del bono social",
+          "alquiler_dia": "Alquiler de equipos de medida",
+          "otros_dia": "Otros servicios por día",
+          "otros_mes": "Otros servicios por ciclo",
+          "impuesto_electrico": "Impuesto sobre la electricidad",
+          "impuesto_minimo_mwh": "Mínimo del impuesto eléctrico",
+          "iva": "IVA"
+        }
+      },
+      "hucha": {
+        "title": "Hucha de excedentes",
+        "data": {
+          "hucha_enabled": "Tengo hucha de excedentes",
+          "hucha_balance": "Saldo de la hucha",
+          "hucha_date": "Saldo a fecha de"
+        },
+        "data_description": {
+          "hucha_balance": "El de tu última factura.",
+          "hucha_date": "Último día del periodo de esa factura."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "periodo_actual": {
+        "name": "Periodo tarifario",
+        "state": {
+          "punta": "Punta",
+          "llano": "Llano",
+          "valle": "Valle"
+        }
+      },
+      "precio_energia": {
+        "name": "Precio de la energía con impuestos"
+      },
+      "precio_excedentes": {
+        "name": "Precio de compensación de excedentes"
+      },
+      "consumo_punta": {
+        "name": "Consumo punta del ciclo"
+      },
+      "consumo_llano": {
+        "name": "Consumo llano del ciclo"
+      },
+      "consumo_valle": {
+        "name": "Consumo valle del ciclo"
+      },
+      "consumo_total": {
+        "name": "Consumo neto del ciclo"
+      },
+      "excedentes": {
+        "name": "Excedentes netos del ciclo"
+      },
+      "factura_estimada": {
+        "name": "Factura estimada (antes de la hucha)"
+      },
+      "hucha_aplicada": {
+        "name": "Hucha aplicada"
+      },
+      "factura_a_pagar": {
+        "name": "Factura a pagar"
+      },
+      "hucha_ingreso": {
+        "name": "Ingreso en la hucha"
+      },
+      "coste_real": {
+        "name": "Coste real del ciclo"
+      },
+      "saldo_hucha_proyectado": {
+        "name": "Saldo de la hucha previsto"
+      },
+      "saldo_hucha_facturado": {
+        "name": "Saldo de la hucha facturado"
+      },
+      "factura_anterior": {
+        "name": "Factura del ciclo anterior"
+      },
+      "coste_real_anterior": {
+        "name": "Coste real del ciclo anterior"
+      },
+      "coste_real_ano": {
+        "name": "Coste real del año"
+      },
+      "historial_facturas": {
+        "name": "Historial de facturas"
+      },
+      "costes_fijos": {
+        "name": "Costes fijos acumulados"
+      },
+      "energia_costes_fijos": {
+        "name": "Energía de costes fijos"
+      },
+      "desfase_importacion": {
+        "name": "Desfase de importación"
+      },
+      "desfase_exportacion": {
+        "name": "Desfase de exportación"
+      },
+      "ultimo_dato_oficial": {
+        "name": "Último dato oficial"
+      }
+    },
+    "number": {
+      "factor_importacion": {
+        "name": "Factor de importación"
+      },
+      "factor_exportacion": {
+        "name": "Factor de exportación"
+      },
+      "desfase_importacion_wh": {
+        "name": "Desfase de importación por hora"
+      },
+      "desfase_exportacion_wh": {
+        "name": "Desfase de exportación por hora"
+      }
+    }
+  },
+  "services": {
+    "nueva_tarifa": {
+      "name": "Nueva tarifa",
+      "description": "Añade una versión de precios con efecto desde una fecha; la anterior sigue valiendo hasta entonces.",
+      "fields": {
+        "fecha": {
+          "name": "Fecha de efecto",
+          "description": "Primer día con los nuevos precios."
+        },
+        "potencia_punta_kw": {
+          "name": "Potencia contratada punta",
+          "description": ""
+        },
+        "potencia_valle_kw": {
+          "name": "Potencia contratada valle",
+          "description": ""
+        },
+        "precio_potencia_punta": {
+          "name": "Precio potencia punta",
+          "description": ""
+        },
+        "precio_potencia_valle": {
+          "name": "Precio potencia valle",
+          "description": ""
+        },
+        "precio_punta": {
+          "name": "Energía punta",
+          "description": ""
+        },
+        "precio_llano": {
+          "name": "Energía llano",
+          "description": ""
+        },
+        "precio_valle": {
+          "name": "Energía valle",
+          "description": ""
+        },
+        "precio_excedentes": {
+          "name": "Compensación de excedentes",
+          "description": ""
+        },
+        "bono_social_dia": {
+          "name": "Financiación del bono social",
+          "description": ""
+        },
+        "alquiler_dia": {
+          "name": "Alquiler de equipos de medida",
+          "description": ""
+        },
+        "otros_dia": {
+          "name": "Otros servicios por día",
+          "description": ""
+        },
+        "otros_mes": {
+          "name": "Otros servicios por ciclo",
+          "description": ""
+        },
+        "impuesto_electrico": {
+          "name": "Impuesto sobre la electricidad",
+          "description": ""
+        },
+        "impuesto_minimo_mwh": {
+          "name": "Mínimo del impuesto eléctrico",
+          "description": ""
+        },
+        "iva": {
+          "name": "IVA",
+          "description": ""
+        }
+      }
+    },
+    "importar_datos_distribuidora": {
+      "name": "Importar datos de la distribuidora",
+      "description": "Lee un CSV horario de la distribuidora (consumo por periodo o consumo facturado) y lo usa como dato oficial.",
+      "fields": {
+        "ruta": {
+          "name": "Ruta del CSV",
+          "description": "Por ejemplo /config/factusol/consumo.csv"
+        }
+      }
+    },
+    "calibrar": {
+      "name": "Calibrar la pinza",
+      "description": "Compara hora a hora tu medida con la oficial y calcula el factor y el desfase.",
+      "fields": {
+        "desde": {
+          "name": "Desde",
+          "description": ""
+        },
+        "hasta": {
+          "name": "Hasta",
+          "description": ""
+        },
+        "modo": {
+          "name": "Modo",
+          "description": "Solo factor, o factor y desfase por hora."
+        },
+        "aplicar": {
+          "name": "Aplicar",
+          "description": "Guarda el resultado en las entidades de factor y desfase."
+        }
+      }
+    },
+    "reconstruir_historial": {
+      "name": "Reconstruir historial",
+      "description": "Rellena las horas sin medida propia con las estadísticas que Home Assistant ya tiene de tus sensores.",
+      "fields": {
+        "desde": {
+          "name": "Desde",
+          "description": ""
+        }
+      }
+    },
+    "registrar_factura": {
+      "name": "Registrar factura real",
+      "description": "Guarda los datos de una factura recibida: sustituyen a la estimación y fijan el saldo de la hucha.",
+      "fields": {
+        "fecha_fin": {
+          "name": "Último día del periodo",
+          "description": ""
+        },
+        "total_bruto": {
+          "name": "Total con IVA antes de la hucha",
+          "description": ""
+        },
+        "hucha_aplicada": {
+          "name": "Hucha aplicada",
+          "description": ""
+        },
+        "total_a_pagar": {
+          "name": "Total a pagar",
+          "description": ""
+        },
+        "hucha_ingreso": {
+          "name": "Importe almacenado este mes",
+          "description": ""
+        },
+        "saldo_hucha_final": {
+          "name": "Saldo de la hucha tras la factura",
+          "description": ""
+        },
+        "consumo_punta": {
+          "name": "Consumo punta",
+          "description": ""
+        },
+        "consumo_llano": {
+          "name": "Consumo llano",
+          "description": ""
+        },
+        "consumo_valle": {
+          "name": "Consumo valle",
+          "description": ""
+        },
+        "excedente_kwh": {
+          "name": "Energía excedentaria",
+          "description": ""
+        }
+      }
+    },
+    "ajustar_hucha": {
+      "name": "Ajustar hucha",
+      "description": "Fija el saldo de la hucha a una fecha.",
+      "fields": {
+        "saldo": {
+          "name": "Saldo",
+          "description": ""
+        },
+        "fecha": {
+          "name": "Fecha",
+          "description": ""
+        }
+      }
+    },
+    "ajustar_costes_fijos": {
+      "name": "Ajustar costes fijos",
+      "description": "Fija el acumulado de costes fijos, por ejemplo al migrar un sensor anterior.",
+      "fields": {
+        "valor": {
+          "name": "Valor",
+          "description": ""
+        }
+      }
+    }
+  },
+  "selector": {
+    "modo": {
+      "options": {
+        "factor": "Solo factor",
+        "factor_y_desfase": "Factor y desfase"
+      }
+    }
+  }
+}

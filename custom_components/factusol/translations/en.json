@@ -1,0 +1,418 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Factusol: data source",
+        "description": "Computes your 2.0TD electricity bill with hourly netting.",
+        "data": {
+          "import_entity": "Energy imported from the grid",
+          "export_entity": "Energy exported to the grid",
+          "cycle_day": "Billing cycle start day",
+          "extra_holidays": "Extra holidays (DD/MM, comma separated)",
+          "name": "Name"
+        },
+        "data_description": {
+          "import_entity": "Cumulative energy sensor (kWh, Wh) of your clamp or meter: what you buy from the grid.",
+          "export_entity": "What you send to the grid. Optional without solar.",
+          "cycle_day": "1 if you are billed by calendar month.",
+          "extra_holidays": "Fixed national holidays are already included."
+        }
+      },
+      "precios": {
+        "title": "Contract prices",
+        "description": "Copy the prices from your bill.",
+        "data": {
+          "potencia_punta_kw": "Contracted power (peak)",
+          "potencia_valle_kw": "Contracted power (off-peak)",
+          "precio_potencia_punta": "Power price (peak)",
+          "precio_potencia_valle": "Power price (off-peak)",
+          "precio_punta": "Energy price (peak)",
+          "precio_llano": "Energy price (standard)",
+          "precio_valle": "Energy price (off-peak)",
+          "precio_excedentes": "Surplus compensation"
+        }
+      },
+      "cargos": {
+        "title": "Charges and taxes",
+        "data": {
+          "bono_social_dia": "Social bonus financing",
+          "alquiler_dia": "Meter rental",
+          "otros_dia": "Other services per day",
+          "otros_mes": "Other services per cycle",
+          "impuesto_electrico": "Electricity tax",
+          "impuesto_minimo_mwh": "Minimum electricity tax",
+          "iva": "VAT"
+        }
+      },
+      "hucha": {
+        "title": "Surplus balance",
+        "description": "Euro balance of surplus the retailer keeps and discounts from future bills.",
+        "data": {
+          "hucha_enabled": "I have a surplus balance",
+          "hucha_balance": "Surplus balance",
+          "hucha_date": "Balance as of"
+        },
+        "data_description": {
+          "hucha_balance": "The one on your last bill.",
+          "hucha_date": "Last day of that bill's period."
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This import sensor is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Factusol options",
+        "menu_options": {
+          "fuentes": "Data source and cycle",
+          "precios": "Prices (current tariff)",
+          "cargos": "Charges and taxes (current tariff)",
+          "hucha": "Surplus balance"
+        }
+      },
+      "fuentes": {
+        "title": "Data source and cycle",
+        "data": {
+          "import_entity": "Energy imported from the grid",
+          "export_entity": "Energy exported to the grid",
+          "cycle_day": "Billing cycle start day",
+          "extra_holidays": "Extra holidays (DD/MM, comma separated)"
+        },
+        "data_description": {
+          "import_entity": "Cumulative energy sensor (kWh, Wh) of your clamp or meter: what you buy from the grid.",
+          "export_entity": "What you send to the grid. Optional without solar.",
+          "cycle_day": "1 if you are billed by calendar month.",
+          "extra_holidays": "Fixed national holidays are already included."
+        }
+      },
+      "precios": {
+        "title": "Current tariff prices",
+        "description": "For a dated price change use the nueva_tarifa service.",
+        "data": {
+          "potencia_punta_kw": "Contracted power (peak)",
+          "potencia_valle_kw": "Contracted power (off-peak)",
+          "precio_potencia_punta": "Power price (peak)",
+          "precio_potencia_valle": "Power price (off-peak)",
+          "precio_punta": "Energy price (peak)",
+          "precio_llano": "Energy price (standard)",
+          "precio_valle": "Energy price (off-peak)",
+          "precio_excedentes": "Surplus compensation"
+        }
+      },
+      "cargos": {
+        "title": "Current tariff charges and taxes",
+        "data": {
+          "bono_social_dia": "Social bonus financing",
+          "alquiler_dia": "Meter rental",
+          "otros_dia": "Other services per day",
+          "otros_mes": "Other services per cycle",
+          "impuesto_electrico": "Electricity tax",
+          "impuesto_minimo_mwh": "Minimum electricity tax",
+          "iva": "VAT"
+        }
+      },
+      "hucha": {
+        "title": "Surplus balance",
+        "data": {
+          "hucha_enabled": "I have a surplus balance",
+          "hucha_balance": "Surplus balance",
+          "hucha_date": "Balance as of"
+        },
+        "data_description": {
+          "hucha_balance": "The one on your last bill.",
+          "hucha_date": "Last day of that bill's period."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "periodo_actual": {
+        "name": "Tariff period",
+        "state": {
+          "punta": "Peak",
+          "llano": "Standard",
+          "valle": "Off-peak"
+        }
+      },
+      "precio_energia": {
+        "name": "Energy price with taxes"
+      },
+      "precio_excedentes": {
+        "name": "Surplus compensation price"
+      },
+      "consumo_punta": {
+        "name": "Peak consumption this cycle"
+      },
+      "consumo_llano": {
+        "name": "Standard consumption this cycle"
+      },
+      "consumo_valle": {
+        "name": "Off-peak consumption this cycle"
+      },
+      "consumo_total": {
+        "name": "Net consumption this cycle"
+      },
+      "excedentes": {
+        "name": "Net surplus this cycle"
+      },
+      "factura_estimada": {
+        "name": "Estimated bill (before the surplus balance)"
+      },
+      "hucha_aplicada": {
+        "name": "Surplus balance applied"
+      },
+      "factura_a_pagar": {
+        "name": "Bill to pay"
+      },
+      "hucha_ingreso": {
+        "name": "Surplus balance deposit"
+      },
+      "coste_real": {
+        "name": "Real cost of the cycle"
+      },
+      "saldo_hucha_proyectado": {
+        "name": "Projected surplus balance"
+      },
+      "saldo_hucha_facturado": {
+        "name": "Billed surplus balance"
+      },
+      "factura_anterior": {
+        "name": "Previous cycle bill"
+      },
+      "coste_real_anterior": {
+        "name": "Previous cycle real cost"
+      },
+      "coste_real_ano": {
+        "name": "Real cost this year"
+      },
+      "historial_facturas": {
+        "name": "Bill history"
+      },
+      "costes_fijos": {
+        "name": "Accumulated fixed costs"
+      },
+      "energia_costes_fijos": {
+        "name": "Fixed costs energy"
+      },
+      "desfase_importacion": {
+        "name": "Import offset"
+      },
+      "desfase_exportacion": {
+        "name": "Export offset"
+      },
+      "ultimo_dato_oficial": {
+        "name": "Last official data"
+      }
+    },
+    "number": {
+      "factor_importacion": {
+        "name": "Import factor"
+      },
+      "factor_exportacion": {
+        "name": "Export factor"
+      },
+      "desfase_importacion_wh": {
+        "name": "Import offset per hour"
+      },
+      "desfase_exportacion_wh": {
+        "name": "Export offset per hour"
+      }
+    }
+  },
+  "services": {
+    "nueva_tarifa": {
+      "name": "New tariff",
+      "description": "Adds a price version effective from a date.",
+      "fields": {
+        "fecha": {
+          "name": "Effective date",
+          "description": "First day with the new prices."
+        },
+        "potencia_punta_kw": {
+          "name": "Contracted power (peak)",
+          "description": ""
+        },
+        "potencia_valle_kw": {
+          "name": "Contracted power (off-peak)",
+          "description": ""
+        },
+        "precio_potencia_punta": {
+          "name": "Power price (peak)",
+          "description": ""
+        },
+        "precio_potencia_valle": {
+          "name": "Power price (off-peak)",
+          "description": ""
+        },
+        "precio_punta": {
+          "name": "Energy price (peak)",
+          "description": ""
+        },
+        "precio_llano": {
+          "name": "Energy price (standard)",
+          "description": ""
+        },
+        "precio_valle": {
+          "name": "Energy price (off-peak)",
+          "description": ""
+        },
+        "precio_excedentes": {
+          "name": "Surplus compensation",
+          "description": ""
+        },
+        "bono_social_dia": {
+          "name": "Social bonus financing",
+          "description": ""
+        },
+        "alquiler_dia": {
+          "name": "Meter rental",
+          "description": ""
+        },
+        "otros_dia": {
+          "name": "Other services per day",
+          "description": ""
+        },
+        "otros_mes": {
+          "name": "Other services per cycle",
+          "description": ""
+        },
+        "impuesto_electrico": {
+          "name": "Electricity tax",
+          "description": ""
+        },
+        "impuesto_minimo_mwh": {
+          "name": "Minimum electricity tax",
+          "description": ""
+        },
+        "iva": {
+          "name": "VAT",
+          "description": ""
+        }
+      }
+    },
+    "importar_datos_distribuidora": {
+      "name": "Import distributor data",
+      "description": "Reads an hourly CSV from the distributor.",
+      "fields": {
+        "ruta": {
+          "name": "CSV path",
+          "description": "For example /config/factusol/consumo.csv"
+        }
+      }
+    },
+    "calibrar": {
+      "name": "Calibrate the clamp",
+      "description": "Compares your hourly measurement with the official one.",
+      "fields": {
+        "desde": {
+          "name": "From",
+          "description": ""
+        },
+        "hasta": {
+          "name": "To",
+          "description": ""
+        },
+        "modo": {
+          "name": "Mode",
+          "description": "Factor only, or factor and per-hour offset."
+        },
+        "aplicar": {
+          "name": "Apply",
+          "description": "Stores the result in the factor and offset entities."
+        }
+      }
+    },
+    "reconstruir_historial": {
+      "name": "Rebuild history",
+      "description": "Fills hours without own data from existing statistics.",
+      "fields": {
+        "desde": {
+          "name": "From",
+          "description": ""
+        }
+      }
+    },
+    "registrar_factura": {
+      "name": "Register real bill",
+      "description": "Stores a received bill's data.",
+      "fields": {
+        "fecha_fin": {
+          "name": "Last day of the period",
+          "description": ""
+        },
+        "total_bruto": {
+          "name": "Total with VAT before the balance",
+          "description": ""
+        },
+        "hucha_aplicada": {
+          "name": "Balance applied",
+          "description": ""
+        },
+        "total_a_pagar": {
+          "name": "Total to pay",
+          "description": ""
+        },
+        "hucha_ingreso": {
+          "name": "Amount stored this month",
+          "description": ""
+        },
+        "saldo_hucha_final": {
+          "name": "Balance after the bill",
+          "description": ""
+        },
+        "consumo_punta": {
+          "name": "Peak consumption",
+          "description": ""
+        },
+        "consumo_llano": {
+          "name": "Standard consumption",
+          "description": ""
+        },
+        "consumo_valle": {
+          "name": "Off-peak consumption",
+          "description": ""
+        },
+        "excedente_kwh": {
+          "name": "Surplus energy",
+          "description": ""
+        }
+      }
+    },
+    "ajustar_hucha": {
+      "name": "Set surplus balance",
+      "description": "Sets the balance at a date.",
+      "fields": {
+        "saldo": {
+          "name": "Balance",
+          "description": ""
+        },
+        "fecha": {
+          "name": "Date",
+          "description": ""
+        }
+      }
+    },
+    "ajustar_costes_fijos": {
+      "name": "Set fixed costs",
+      "description": "Sets the accumulated fixed costs.",
+      "fields": {
+        "valor": {
+          "name": "Value",
+          "description": ""
+        }
+      }
+    }
+  },
+  "selector": {
+    "modo": {
+      "options": {
+        "factor": "Factor only",
+        "factor_y_desfase": "Factor and offset"
+      }
+    }
+  }
+}

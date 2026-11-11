@@ -1,0 +1,288 @@
+nueva_tarifa:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: factusol
+    fecha:
+      required: true
+      selector:
+        date:
+    potencia_punta_kw:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "kW"
+    potencia_valle_kw:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "kW"
+    precio_potencia_punta:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/kW·día"
+    precio_potencia_valle:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/kW·día"
+    precio_punta:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/kWh"
+    precio_llano:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/kWh"
+    precio_valle:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/kWh"
+    precio_excedentes:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/kWh"
+    bono_social_dia:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/día"
+    alquiler_dia:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/día"
+    otros_dia:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/día"
+    otros_mes:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/ciclo"
+    impuesto_electrico:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "%"
+    impuesto_minimo_mwh:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "€/MWh"
+    iva:
+      selector:
+        number:
+          min: 0
+          max: 1000
+          step: any
+          mode: box
+          unit_of_measurement: "%"
+importar_datos_distribuidora:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: factusol
+    ruta:
+      required: true
+      selector:
+        text:
+calibrar:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: factusol
+    desde:
+      selector:
+        date:
+    hasta:
+      selector:
+        date:
+    modo:
+      selector:
+        select:
+          options:
+            - factor
+            - factor_y_desfase
+          translation_key: modo
+    aplicar:
+      selector:
+        boolean:
+reconstruir_historial:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: factusol
+    desde:
+      required: true
+      selector:
+        date:
+registrar_factura:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: factusol
+    fecha_fin:
+      required: true
+      selector:
+        date:
+    total_bruto:
+      selector:
+        number:
+          min: 0
+          max: 1000000
+          step: 0.01
+          mode: box
+          unit_of_measurement: "€"
+    hucha_aplicada:
+      selector:
+        number:
+          min: 0
+          max: 1000000
+          step: 0.01
+          mode: box
+          unit_of_measurement: "€"
+    total_a_pagar:
+      selector:
+        number:
+          min: 0
+          max: 1000000
+          step: 0.01
+          mode: box
+          unit_of_measurement: "€"
+    hucha_ingreso:
+      selector:
+        number:
+          min: 0
+          max: 1000000
+          step: 0.01
+          mode: box
+          unit_of_measurement: "€"
+    saldo_hucha_final:
+      selector:
+        number:
+          min: 0
+          max: 1000000
+          step: 0.01
+          mode: box
+          unit_of_measurement: "€"
+    consumo_punta:
+      selector:
+        number:
+          min: 0
+          max: 1000000
+          step: 0.01
+          mode: box
+          unit_of_measurement: "kWh"
+    consumo_llano:
+      selector:
+        number:
+          min: 0
+          max: 1000000
+          step: 0.01
+          mode: box
+          unit_of_measurement: "kWh"
+    consumo_valle:
+      selector:
+        number:
+          min: 0
+          max: 1000000
+          step: 0.01
+          mode: box
+          unit_of_measurement: "kWh"
+    excedente_kwh:
+      selector:
+        number:
+          min: 0
+          max: 1000000
+          step: 0.01
+          mode: box
+          unit_of_measurement: "kWh"
+ajustar_hucha:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: factusol
+    saldo:
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 100000
+          step: 0.01
+          mode: box
+          unit_of_measurement: "€"
+    fecha:
+      required: true
+      selector:
+        date:
+ajustar_costes_fijos:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: factusol
+    valor:
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 10000000
+          step: 0.0001
+          mode: box
+          unit_of_measurement: "€"

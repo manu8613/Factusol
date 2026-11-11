@@ -1,0 +1,27 @@
+{
+  "entity": {
+    "sensor": {
+      "periodo_actual": {"default": "mdi:clock-time-four-outline"},
+      "factura_estimada": {"default": "mdi:receipt-text"},
+      "factura_a_pagar": {"default": "mdi:cash-register"},
+      "hucha_aplicada": {"default": "mdi:piggy-bank"},
+      "hucha_ingreso": {"default": "mdi:piggy-bank-outline"},
+      "saldo_hucha_proyectado": {"default": "mdi:piggy-bank"},
+      "saldo_hucha_facturado": {"default": "mdi:piggy-bank"},
+      "coste_real": {"default": "mdi:scale-balance"},
+      "coste_real_anterior": {"default": "mdi:scale-balance"},
+      "coste_real_ano": {"default": "mdi:scale-balance"},
+      "desfase_importacion": {"default": "mdi:delta"},
+      "desfase_exportacion": {"default": "mdi:delta"}
+    }
+  },
+  "services": {
+    "nueva_tarifa": {"service": "mdi:tag-plus"},
+    "importar_datos_distribuidora": {"service": "mdi:file-import"},
+    "calibrar": {"service": "mdi:tune-vertical"},
+    "reconstruir_historial": {"service": "mdi:history"},
+    "registrar_factura": {"service": "mdi:receipt-text-check"},
+    "ajustar_hucha": {"service": "mdi:piggy-bank"},
+    "ajustar_costes_fijos": {"service": "mdi:cash-plus"}
+  }
+}
