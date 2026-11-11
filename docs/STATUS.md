@@ -1,6 +1,6 @@
 # Estado
 
-Versión: v0.1.0 (sin publicar) · Rama: `feat/v0.1.0` · Actualizado: 2026-11-11
+Versión: v0.1.0 (sin publicar) · Rama: `feat/v0.1.0` · Commit de referencia: `d8d7752` · Actualizado: 2026-11-11
 
 ## Funciona (comprobado)
 - Motor de facturación 2.0TD: reproduce al céntimo dos facturas reales de autoconsumo con hucha (importe a pagar, ingreso en la hucha y saldo).
