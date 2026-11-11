@@ -60,7 +60,7 @@ El dato oficial suele tardar uno o dos días: las horas sin dato oficial se calc
 
 ## Importar la factura en PDF
 
-`factusol.importar_factura_pdf` recibe el PDF en base64 (`contenido`), lo lee en memoria y registra la factura: periodo, kWh por tramo, excedentes, total, hucha aplicada, ingreso y saldo. Solo se guardan cifras; el PDF y su texto no se conservan. Comprueba que las cifras cuadran y, si los precios cambiaron, crea una tarifa nueva desde el primer día del periodo (`actualizar_tarifa`, activado por defecto). Es el formato de factura de una comercializadora con Solar Cloud; otros formatos necesitan su propio lector. La pestaña Luz de [Centro de Control](https://github.com/manu8613/centro-control) (2.9.0+) lo hace con un botón.
+`factusol.importar_factura_pdf` recibe el PDF en base64 (`contenido`), lo lee en memoria y registra la factura: periodo, kWh por tramo, excedentes, total, hucha aplicada, ingreso y saldo. Solo se guardan cifras; el PDF y su texto no se conservan. Comprueba que las cifras cuadran y, si los precios cambiaron, crea una tarifa nueva desde el primer día del periodo (`actualizar_tarifa`, activado por defecto). Es el formato de factura de una comercializadora con hucha de excedentes en euros; otros formatos necesitan su propio lector. La pestaña Luz de [Centro de Control](https://github.com/manu8613/centro-control) (2.9.0+) lo hace con un botón.
 
 Los ciclos siguen los días que cobró cada factura: si la factura va del 15 al 14, ese ciclo dura exactamente esos días y el siguiente empieza el 15. También puedes indicarlo a mano con `fecha_inicio` en `registrar_factura`.
 

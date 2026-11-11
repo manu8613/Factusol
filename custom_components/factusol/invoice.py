@@ -1,4 +1,4 @@
-"""Lectura de facturas de luz 2.0TD en PDF (formato de la comercializadora con Solar Cloud).
+"""Lectura de facturas de luz 2.0TD en PDF (formato de comercializadora con hucha de excedentes en euros).
 
 Este módulo no depende de Home Assistant. Del PDF solo se conservan cifras: el texto
 completo (que incluye datos personales) no se guarda ni se registra en ningún sitio.
@@ -124,15 +124,15 @@ def parse_invoice(text: str) -> ParsedInvoice:
     if not total or not iva:
         raise InvoiceError("No encuentro el importe total y el IVA de la factura")
     f["total_bruto"] = round(_n(total.group(1)) + _n(iva.group(1)), 2)
-    if m := re.search(rf"Bono Solar Cloud \(1\) ({_NUM}) €", flat):
+    if m := re.search(rf"Bono [^\W\d_]+(?: [^\W\d_]+)? \(1\) ({_NUM}) €", flat):
         f["hucha_aplicada"] = abs(_n(m.group(1)))
     if m := re.search(rf"TOTAL IMPORTE FACTURA ({_NUM}) €", flat):
         f["total_a_pagar"] = _n(m.group(1))
-    if m := re.search(rf"importe almacenado en Solar Cloud.*? ha sido de ({_NUM}) ?€", flat):
+    if m := re.search(rf"importe almacenado en [^\W\d_]+(?: [^\W\d_]+)? \(por excedentes no compensados\).*? ha sido de ({_NUM}) ?€", flat):
         f["hucha_ingreso"] = _n(m.group(1))
     elif "excedente_kwh" in f:
         f["hucha_ingreso"] = 0.0
-    if m := re.search(rf"saldo Solar Cloud disponible.*?(?:ascienda|asciende) a un total de ({_NUM}) ?€", flat):
+    if m := re.search(rf"saldo [^\W\d_]+(?: [^\W\d_]+)? disponible a la fecha, (?:ascienda|asciende) a un total de ({_NUM}) ?€", flat):
         f["saldo_hucha_final"] = _n(m.group(1))
     # Comprobaciones: lo leído debe cuadrar entre sí
     if (m := re.search(rf"Total ({_NUM}) kWh hasta", flat)) and f.keys() >= {"consumo_punta", "consumo_llano", "consumo_valle"}:

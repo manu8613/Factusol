@@ -14,10 +14,10 @@ def sample_invoice(
         "Compensación de excedentes (2) -1,60 €\n"
         "(2) La energía excedentaria del último mes es -40,00 kWh y el precio de compensación "
         "de los excedentes es 0,07 € /kWh, según el RD 244/2019.\n"
-        "Le recordamos que, gracias al servicio Solar Cloud, en esta factura se le ha aplicado un ahorro de 9,68 €.\n"
-        "Además, este mes, el importe almacenado en Solar Cloud (por excedentes no compensados), ha sido de 1,20 €. "
-        "Esto hace que su saldo Solar Cloud disponible a la fecha, ascienda a un total de 150,00 \n€. Este saldo se aplicará.\n"
-        "Bono Solar Cloud (1) -9,68 €\n"
+        "Le recordamos que, gracias al servicio Hucha Verde, en esta factura se le ha aplicado un ahorro de 9,68 €.\n"
+        "Además, este mes, el importe almacenado en Hucha Verde (por excedentes no compensados), ha sido de 1,20 €. "
+        "Esto hace que su saldo Hucha Verde disponible a la fecha, ascienda a un total de 150,00 \n€. Este saldo se aplicará.\n"
+        "Bono Hucha Verde (1) -9,68 €\n"
         if surplus
         else ""
     )
