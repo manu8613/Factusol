@@ -2,6 +2,9 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiones: [SemVer](https://semver.org/lang/es/).
 
+## [0.1.2] - 2026-11-11
+- Icono y logo propios (Home Assistant 2026.3 o posterior los toma de `brand/`): un sol que sale por detrás de una factura, con un rayo y el símbolo del euro. Dibujo original, sin marcas ni personajes.
+
 ## [0.1.1] - 2026-11-11
 - `importar_datos_distribuidora` acepta el texto del CSV en `contenido` como alternativa a `ruta`, para cargar los datos de la distribuidora desde un script sin copiar ficheros a Home Assistant (máximo 8 MB; se indica una de las dos opciones).
 
