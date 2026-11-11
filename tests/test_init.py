@@ -390,3 +390,19 @@ async def test_register_bill_with_explicit_start_keeps_cycle_days(hass: HomeAssi
     )
     assert result["ciclo"] == "2026-10-01"
     assert [c.key for c in entry.runtime_data.data.cycles] == ["2026-10-01", "2026-10-21"]
+
+
+async def test_history_lists_invoices_older_than_the_initial_balance(hass: HomeAssistant) -> None:
+    entry = await _setup(hass)
+    await hass.services.async_call(
+        DOMAIN,
+        "registrar_factura",
+        {"fecha_fin": "2026-08-31", "total_bruto": 20.95, "hucha_aplicada": 20.95, "hucha_ingreso": 31.71, "saldo_hucha_final": 175.29, "consumo_punta": 9.25, "consumo_llano": 6.01, "consumo_valle": 21.23, "excedente_kwh": 522.63},
+        blocking=True,
+        return_response=True,
+    )
+    months = _sensor(hass, entry, "historial_facturas").attributes["meses"]
+    assert months[0]["ciclo"] == "2026-08-01" and months[0]["real"] is True
+    assert months[0]["total_bruto"] == 20.95 and months[0]["consumo_kwh"] == 36.49
+    assert months[0]["coste_real"] == pytest.approx(-10.76)
+    assert months[1]["ciclo"] == "2026-10-01"

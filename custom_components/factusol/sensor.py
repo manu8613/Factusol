@@ -73,7 +73,31 @@ def _history(m: FactusolManager, s: Snapshot) -> dict[str, Any]:
                 "saldo_hucha": _round(b.saldo_hucha_final),
             }
         )
-    return {"meses": months}
+    first = s.cycles[0].start.isoformat() if s.cycles else None
+    older = []
+    for key in sorted(m.invoices):
+        rec = m.invoices[key]
+        if first is None or key >= first or rec.get("total_bruto") is None:
+            continue
+        gross = float(rec["total_bruto"])
+        stored = float(rec.get("hucha_ingreso") or 0.0)
+        applied = float(rec.get("hucha_aplicada") or 0.0)
+        older.append(
+            {
+                "ciclo": key,
+                "cerrado": True,
+                "real": True,
+                "consumo_kwh": _round(sum(float(rec.get(k) or 0.0) for k in ("consumo_punta", "consumo_llano", "consumo_valle"))),
+                "excedente_kwh": _round(rec.get("excedente_kwh") or 0.0),
+                "total_bruto": _round(gross),
+                "hucha_ingreso": _round(stored),
+                "hucha_aplicada": _round(applied),
+                "total_a_pagar": _round(rec.get("total_a_pagar", gross - applied)),
+                "coste_real": _round(gross - stored),
+                "saldo_hucha": None if rec.get("saldo_hucha_final") is None else _round(rec["saldo_hucha_final"]),
+            }
+        )
+    return {"meses": older + months}
 
 
 def _official_last(m: FactusolManager, s: Snapshot) -> datetime | None:
