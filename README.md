@@ -52,7 +52,7 @@ coste real = total bruto − lo que se ingresa en la hucha este ciclo
 
 1. Descarga de la oficina virtual de tu distribuidora el CSV horario (**consumo por periodo**, con consumo y generación) y, si quieres, el de **consumo facturado**.
 2. Copia los ficheros a la carpeta `factusol` dentro de tu carpeta de configuración (Factusol la crea al arrancar).
-3. **Herramientas para desarrolladores → Acciones → `factusol.importar_datos_distribuidora`** con el nombre del fichero. Las horas oficiales sustituyen a las propias en la factura.
+3. **Herramientas para desarrolladores → Acciones → `factusol.importar_datos_distribuidora`** con el nombre del fichero. Las horas oficiales sustituyen a las propias en la factura. Como alternativa a la ruta puedes pasar el texto del CSV en `contenido` (para cargarlo desde un script sin copiar ficheros; máximo 8 MB; indica `ruta` o `contenido`, no ambos).
 4. Si Home Assistant ya tenía estadísticas de tus sensores de antes de instalar Factusol, ejecuta `factusol.reconstruir_historial` con la fecha de inicio: rellena las horas que faltan.
 5. `factusol.calibrar` compara hora a hora y devuelve, para importación y exportación, el **desfase en %**, el factor de escala, el desfase por hora y el R². Con `aplicar: true` lo guarda en las entidades **Factor** y **Desfase** de Factusol (se pueden editar a mano). Los sensores *Desfase de importación/exportación* muestran el resultado y el detalle por meses.
 

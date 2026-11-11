@@ -135,9 +135,12 @@ importar_datos_distribuidora:
         config_entry:
           integration: factusol
     ruta:
-      required: true
       selector:
         text:
+    contenido:
+      selector:
+        text:
+          multiline: true
 calibrar:
   fields:
     config_entry_id:

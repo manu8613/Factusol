@@ -301,6 +301,10 @@
         "ruta": {
           "name": "CSV path",
           "description": "For example /config/factusol/consumo.csv"
+        },
+        "contenido": {
+          "name": "CSV content",
+          "description": "Full CSV text, as an alternative to the path (useful to load it from a script)."
         }
       }
     },

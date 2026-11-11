@@ -29,7 +29,16 @@ _NUM = vol.Coerce(float)
 NEW_TARIFF_SCHEMA = vol.Schema(
     {**_ENTRY, vol.Required("fecha"): cv.date, **{vol.Optional(f): _NUM for f in TARIFF_FIELDS}}
 )
-IMPORT_SCHEMA = vol.Schema({**_ENTRY, vol.Required("ruta"): cv.string})
+IMPORT_SCHEMA = vol.All(
+    vol.Schema(
+        {
+            **_ENTRY,
+            vol.Exclusive("ruta", "origen"): cv.string,
+            vol.Exclusive("contenido", "origen"): cv.string,
+        }
+    ),
+    cv.has_at_least_one_key("ruta", "contenido"),
+)
 CALIBRATE_SCHEMA = vol.Schema(
     {
         **_ENTRY,
@@ -76,7 +85,7 @@ def async_setup_services(hass: HomeAssistant) -> None:
         await _manager(hass, call).async_new_tariff(call.data["fecha"], values)
 
     async def import_official(call: ServiceCall) -> dict[str, Any]:
-        return await _manager(hass, call).async_import_official(call.data["ruta"])
+        return await _manager(hass, call).async_import_official(call.data.get("ruta"), call.data.get("contenido"))
 
     async def calibrate(call: ServiceCall) -> dict[str, Any]:
         return await _manager(hass, call).async_calibrate(
