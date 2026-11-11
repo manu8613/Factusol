@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -328,3 +328,65 @@ async def test_unload_and_remove(hass: HomeAssistant) -> None:
     assert await hass.config_entries.async_unload(entry.entry_id)
     assert entry.state is ConfigEntryState.NOT_LOADED
     assert await hass.config_entries.async_remove(entry.entry_id)
+
+
+def _pdf_b64() -> str:
+    import base64
+
+    return base64.b64encode(b"%PDF-1.4 sintetico").decode()
+
+
+async def test_import_invoice_pdf_sets_real_cycle_days(hass: HomeAssistant) -> None:
+    from tests.invoice_sample import sample_invoice
+
+    entry = await _setup(hass)
+    with patch("custom_components.factusol.manager.extract_text", return_value=sample_invoice()):
+        result = await hass.services.async_call(
+            DOMAIN, "importar_factura_pdf", {"contenido": _pdf_b64()}, blocking=True, return_response=True
+        )
+    assert result["periodo"]["inicio"] == "2026-10-01" and result["periodo"]["fin"] == "2026-10-14"
+    assert result["ciclo"] == "2026-10-01"
+    assert "tarifa_actualizada" not in result  # los precios coinciden con los guardados
+    snap = entry.runtime_data.data
+    assert [c.key for c in snap.cycles] == ["2026-10-01", "2026-10-15"]
+    first = snap.cycles[0]
+    assert first.end == date(2026, 10, 15) and first.closed
+    assert float(first.bill.total_bruto) == 9.68
+    assert float(first.bill.saldo_hucha_final) == pytest.approx(150.0)
+    assert snap.current.start == date(2026, 10, 15)
+    assert float(snap.current.bill.saldo_hucha_inicial) == pytest.approx(150.0)
+
+
+async def test_import_invoice_pdf_updates_changed_prices(hass: HomeAssistant) -> None:
+    from tests.invoice_sample import sample_invoice
+
+    entry = await _setup(hass)
+    with patch("custom_components.factusol.manager.extract_text", return_value=sample_invoice(price_peak="0,210000")):
+        result = await hass.services.async_call(
+            DOMAIN, "importar_factura_pdf", {"contenido": _pdf_b64()}, blocking=True, return_response=True
+        )
+    assert result["tarifa_actualizada"] == {"precio_punta": 0.21}
+    await hass.async_block_till_done()
+    tariffs = entry.options["tarifas"]
+    assert tariffs[-1]["desde"] == "2026-10-01" and tariffs[-1]["precio_punta"] == 0.21
+
+
+async def test_import_invoice_pdf_rejects_garbage(hass: HomeAssistant) -> None:
+    await _setup(hass)
+    with pytest.raises(HomeAssistantError, match="no es un PDF"):
+        await hass.services.async_call(DOMAIN, "importar_factura_pdf", {"contenido": "aG9sYQ=="}, blocking=True, return_response=True)
+    with pytest.raises(HomeAssistantError):
+        await hass.services.async_call(DOMAIN, "importar_factura_pdf", {"contenido": "###"}, blocking=True, return_response=True)
+
+
+async def test_register_bill_with_explicit_start_keeps_cycle_days(hass: HomeAssistant) -> None:
+    entry = await _setup(hass)
+    result = await hass.services.async_call(
+        DOMAIN,
+        "registrar_factura",
+        {"fecha_inicio": "2026-10-01", "fecha_fin": "2026-10-20", "total_bruto": 12.0},
+        blocking=True,
+        return_response=True,
+    )
+    assert result["ciclo"] == "2026-10-01"
+    assert [c.key for c in entry.runtime_data.data.cycles] == ["2026-10-01", "2026-10-21"]

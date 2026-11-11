@@ -12,8 +12,10 @@ from .compat import vol
 from .const import (
     ATTR_ENTRY,
     DOMAIN,
+    MAX_PDF_B64_CHARS,
     SERVICE_CALIBRATE,
     SERVICE_IMPORT,
+    SERVICE_IMPORT_INVOICE,
     SERVICE_NEW_TARIFF,
     SERVICE_REBUILD,
     SERVICE_REGISTER_BILL,
@@ -53,6 +55,7 @@ BILL_SCHEMA = vol.Schema(
     {
         **_ENTRY,
         vol.Required("fecha_fin"): cv.date,
+        vol.Optional("fecha_inicio"): cv.date,
         vol.Optional("total_bruto"): _NUM,
         vol.Optional("hucha_aplicada"): _NUM,
         vol.Optional("total_a_pagar"): _NUM,
@@ -62,6 +65,13 @@ BILL_SCHEMA = vol.Schema(
         vol.Optional("consumo_llano"): _NUM,
         vol.Optional("consumo_valle"): _NUM,
         vol.Optional("excedente_kwh"): _NUM,
+    }
+)
+INVOICE_PDF_SCHEMA = vol.Schema(
+    {
+        **_ENTRY,
+        vol.Required("contenido"): vol.All(cv.string, vol.Length(max=MAX_PDF_B64_CHARS)),
+        vol.Optional("actualizar_tarifa", default=True): cv.boolean,
     }
 )
 HUCHA_SCHEMA = vol.Schema({**_ENTRY, vol.Required("saldo"): _NUM, vol.Required("fecha"): cv.date})
@@ -96,8 +106,13 @@ def async_setup_services(hass: HomeAssistant) -> None:
         return await _manager(hass, call).async_rebuild_history(call.data["desde"])
 
     async def register_bill(call: ServiceCall) -> dict[str, Any]:
-        data = {k: v for k, v in call.data.items() if k not in (ATTR_ENTRY, "fecha_fin")}
-        return await _manager(hass, call).async_register_bill(call.data["fecha_fin"], data)
+        data = {k: v for k, v in call.data.items() if k not in (ATTR_ENTRY, "fecha_fin", "fecha_inicio")}
+        return await _manager(hass, call).async_register_bill(
+            call.data["fecha_fin"], data, call.data.get("fecha_inicio")
+        )
+
+    async def import_invoice(call: ServiceCall) -> dict[str, Any]:
+        return await _manager(hass, call).async_import_invoice(call.data["contenido"], call.data["actualizar_tarifa"])
 
     async def set_hucha(call: ServiceCall) -> None:
         await _manager(hass, call).async_set_hucha(call.data["saldo"], call.data["fecha"])
@@ -112,6 +127,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
     hass.services.async_register(DOMAIN, SERVICE_REBUILD, rebuild, REBUILD_SCHEMA, supports_response=optional)
     hass.services.async_register(
         DOMAIN, SERVICE_REGISTER_BILL, register_bill, BILL_SCHEMA, supports_response=optional
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_IMPORT_INVOICE, import_invoice, INVOICE_PDF_SCHEMA, supports_response=optional
     )
     hass.services.async_register(DOMAIN, SERVICE_SET_HUCHA, set_hucha, HUCHA_SCHEMA)
     hass.services.async_register(DOMAIN, SERVICE_SET_FIXED, set_fixed, FIXED_SCHEMA)

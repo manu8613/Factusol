@@ -12,6 +12,6 @@
   "integration_type": "service",
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/manu8613/Factusol/issues",
-  "requirements": [],
-  "version": "0.1.2"
+  "requirements": ["pypdf>=6.21.4"],
+  "version": "0.2.0"
 }

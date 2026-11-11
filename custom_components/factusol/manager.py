@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import logging
 from dataclasses import dataclass, replace
 from datetime import UTC, date, datetime, timedelta
@@ -44,6 +45,7 @@ from .const import (
 )
 from .hours import add_months, eh_local, eh_of, local_midnight_eh, month_key
 from .importer import CsvFormatError, parse_csv
+from .invoice import InvoiceError, as_service_data, extract_text, parse_invoice
 from .ledger import (
     DIST_EXP,
     DIST_IMP,
@@ -92,6 +94,13 @@ class Snapshot:
     cycles: list[CycleResult]
     hucha_billed: float
     cost_year: float
+
+
+def _as_date(value: Any) -> date | None:
+    try:
+        return date.fromisoformat(str(value))
+    except ValueError:
+        return None
 
 
 def cycle_start_for(day: date, cycle_day: int) -> date:
@@ -302,21 +311,25 @@ class FactusolManager(DataUpdateCoordinator[Snapshot]):
         )
         balance = dec(self._opt(CONF_HUCHA_BALANCE, 0.0))
         start = cycle_start_for(base_day + timedelta(days=1), self.cycle_day)
-        current_start = cycle_start_for(today, self.cycle_day)
-        if start > current_start:
-            start = current_start
+        if start > today:
+            start = cycle_start_for(today, self.cycle_day)
+        invoice_starts = sorted(d for k in self.invoices if (d := _as_date(k)) is not None)
         results: list[CycleResult] = []
         guard = 0
-        while start <= current_start and guard < 120:
+        while start <= today and guard < 240:
             guard += 1
             end = add_months(start, 1)
+            rec = self.invoices.get(start.isoformat())
+            if rec and (last := _as_date(rec.get("fecha_fin"))) and last >= start:
+                end = last + timedelta(days=1)  # los días reales que cobró la factura
+            elif later := [d for d in invoice_starts if start < d < end]:
+                end = later[0]  # una factura empieza antes de lo previsto
             closed = end <= today
             totals = self._cycle_totals(start, end, now, closed)
             bill = compute_bill(totals.segments, balance, self.hucha_enabled)
-            real = self.invoices.get(start.isoformat())
-            if real:
-                bill = _with_real(bill, real)
-            results.append(CycleResult(start, end, closed, totals, bill, real))
+            if rec:
+                bill = _with_real(bill, rec)
+            results.append(CycleResult(start, end, closed, totals, bill, rec or None))
             balance = bill.saldo_hucha_final
             start = end
         return results
@@ -406,10 +419,21 @@ class FactusolManager(DataUpdateCoordinator[Snapshot]):
         self._save()
         await self.async_request_refresh()
 
-    async def async_register_bill(self, end: date, data: dict[str, Any]) -> dict[str, Any]:
-        """Guarda los datos reales de una factura y compara con la estimación."""
-        start = cycle_start_for(end, self.cycle_day)
+    async def async_register_bill(
+        self, end: date, data: dict[str, Any], start: date | None = None
+    ) -> dict[str, Any]:
+        """Guarda los datos reales de una factura y compara con la estimación.
+
+        Con ``start`` (primer día facturado) el ciclo pasa a durar exactamente los días que
+        cobró la factura; sin él se usa el día de ciclo configurado.
+        """
+        if start is None:
+            start = cycle_start_for(end, self.cycle_day)
+        elif end < start or (end - start).days > 400:
+            raise HomeAssistantError("Las fechas de la factura no son coherentes")
         clean = {k: v for k, v in data.items() if v is not None}
+        if start != cycle_start_for(end, self.cycle_day) or end != add_months(start, 1) - timedelta(days=1):
+            clean["fecha_fin"] = end.isoformat()
         self.invoices.pop(start.isoformat(), None)
         await self.async_refresh()
         estimate = next((c for c in self.data.cycles if c.start == start), None)
@@ -421,6 +445,40 @@ class FactusolManager(DataUpdateCoordinator[Snapshot]):
             out["estimado"] = estimate.bill.as_dict()
             if (real := clean.get("total_bruto")) is not None:
                 out["desviacion_total_bruto"] = round(float(estimate.bill.total_bruto) - float(real), 2)
+        else:
+            out["aviso"] = "Es anterior al saldo inicial de la hucha: se guarda, pero no cambia el cálculo actual"
+        return out
+
+    async def async_import_invoice(self, content: str, apply_tariff: bool = True) -> dict[str, Any]:
+        """Lee una factura en PDF (base64), la registra y, si hace falta, actualiza la tarifa.
+
+        El PDF solo existe en memoria durante la llamada: no se guarda en ningún sitio.
+        """
+        try:
+            raw = base64.b64decode(content, validate=False)
+        except (ValueError, TypeError) as err:
+            raise HomeAssistantError("El contenido del PDF no es base64 válido") from err
+        try:
+            text = await self.hass.async_add_executor_job(extract_text, raw)
+            parsed = parse_invoice(text)
+        except InvoiceError as err:
+            raise HomeAssistantError(str(err)) from err
+        del raw, text
+        result = await self.async_register_bill(parsed.fin, dict(parsed.factura), start=parsed.inicio)
+        out: dict[str, Any] = {"periodo": as_service_data(parsed), **result}
+        if parsed.avisos:
+            out["avisos"] = list(parsed.avisos)
+        if apply_tariff and parsed.tarifa:
+            eligible = [t for t in self.tariff_dicts if t[T_FROM] <= parsed.inicio.isoformat()]
+            current = max(eligible, key=lambda t: t[T_FROM]) if eligible else None
+            changes = {
+                k: v
+                for k, v in parsed.tarifa.items()
+                if current is None or abs(float(current.get(k, 0.0)) - v) > 1e-9
+            }
+            if changes:
+                out["tarifa_actualizada"] = changes
+                await self.async_new_tariff(parsed.inicio, changes)  # recarga la integración: va el último
         return out
 
     async def async_import_official(self, path: str | None = None, content: str | None = None) -> dict[str, Any]:

@@ -1,6 +1,6 @@
 # Estado
 
-Versión: v0.1.2 (rama `feat/icono`, en PR) · Publicada: v0.1.1 (`ae32d87`) · Actualizado: 2026-11-11
+Versión: v0.2.0 (rama `feat/factura-pdf`, en PR) · Publicada: v0.1.2 (`3f47b3a`) · Actualizado: 2026-11-11
 
 ## Funciona (comprobado)
 - Motor de facturación 2.0TD: reproduce al céntimo dos facturas reales de autoconsumo con hucha (importe a pagar, ingreso en la hucha y saldo).
@@ -33,10 +33,9 @@ Versión: v0.1.2 (rama `feat/icono`, en PR) · Publicada: v0.1.1 (`ae32d87`) · 
 - Pendientes: ver arriba. Próximo paso: configurarla en la instalación real y migrar las plantillas actuales.
 
 ## Último cierre
-**Factusol · feat/icono · v0.1.2**
-- Objetivo: icono y logo propios, creativos, de facturación solar.
-- Cambios: `custom_components/factusol/brand/` con `icon.png` (256), `icon@2x.png` (512), `logo.png` y `logo@2x.png`; prueba que comprueba tamaños; CHANGELOG y manifest.
-- Verificado: imágenes revisadas a ojo; pytest y ruff en local.
-- Pendientes: ver el icono en la instalación real tras actualizar y reiniciar (Home Assistant 2026.3 o posterior).
-- Próximo paso: fusionar y actualizar desde HACS.
-
+**Factusol · feat/factura-pdf · v0.2.0**
+- Objetivo: importar facturas de luz en PDF y calcular los ciclos por los días cobrados.
+- Cambios: `invoice.py` (lector, sin Home Assistant), servicio `importar_factura_pdf`, `fecha_inicio` en `registrar_factura`, ciclos con fin real de factura en `_build_chain`, tarifa automática, `pypdf>=6.21.4`, traducciones y tests con facturas sintéticas.
+- Pruebas: 56 en verde (ruff limpio); el lector se probó además en local con dos facturas reales, que cuadran al céntimo con sus totales y saldos.
+- Pendientes: probar el servicio en la instalación real; otras comercializadoras necesitan su propio formato.
+- Próximo paso: fusionar, actualizar desde HACS, reiniciar y subir la factura de octubre desde la pestaña Luz.

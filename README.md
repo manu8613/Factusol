@@ -58,6 +58,12 @@ coste real = total bruto − lo que se ingresa en la hucha este ciclo
 
 El dato oficial suele tardar uno o dos días: las horas sin dato oficial se calculan con tu pinza corregida y el sensor de factura indica cuántas horas son oficiales, propias y cuántas faltan.
 
+## Importar la factura en PDF
+
+`factusol.importar_factura_pdf` recibe el PDF en base64 (`contenido`), lo lee en memoria y registra la factura: periodo, kWh por tramo, excedentes, total, hucha aplicada, ingreso y saldo. Solo se guardan cifras; el PDF y su texto no se conservan. Comprueba que las cifras cuadran y, si los precios cambiaron, crea una tarifa nueva desde el primer día del periodo (`actualizar_tarifa`, activado por defecto). Es el formato de factura de una comercializadora con hucha de excedentes en euros; otros formatos necesitan su propio lector. La pestaña Luz de [Centro de Control](https://github.com/manu8613/centro-control) (2.9.0+) lo hace con un botón.
+
+Los ciclos siguen los días que cobró cada factura: si la factura va del 15 al 14, ese ciclo dura exactamente esos días y el siguiente empieza el 15. También puedes indicarlo a mano con `fecha_inicio` en `registrar_factura`.
+
 ## Registrar una factura real
 
 Cuando llegue la factura, `factusol.registrar_factura` guarda sus importes (total bruto, hucha aplicada, importe almacenado, saldo final y kWh). Sustituyen a la estimación de ese ciclo, fijan el saldo de la hucha para los siguientes y el servicio devuelve la desviación entre lo estimado y lo real.
@@ -100,7 +106,7 @@ Las unidades y clases deben coincidir (euros, kWh, mismo tipo de estado).
 
 ## Servicios
 
-`nueva_tarifa` · `importar_datos_distribuidora` · `calibrar` · `reconstruir_historial` · `registrar_factura` · `ajustar_hucha` · `ajustar_costes_fijos`
+`nueva_tarifa` · `importar_datos_distribuidora` · `calibrar` · `reconstruir_historial` · `registrar_factura` · `importar_factura_pdf` · `ajustar_hucha` · `ajustar_costes_fijos`
 
 ## Límites de la versión 0.1
 

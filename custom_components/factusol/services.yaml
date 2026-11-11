@@ -179,6 +179,9 @@ registrar_factura:
       selector:
         config_entry:
           integration: factusol
+    fecha_inicio:
+      selector:
+        date:
     fecha_fin:
       required: true
       selector:
@@ -289,3 +292,19 @@ ajustar_costes_fijos:
           step: any
           mode: box
           unit_of_measurement: "€"
+
+importar_factura_pdf:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: factusol
+    contenido:
+      required: true
+      selector:
+        text:
+          multiline: true
+    actualizar_tarifa:
+      default: true
+      selector:
+        boolean:

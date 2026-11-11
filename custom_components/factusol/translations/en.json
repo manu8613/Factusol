@@ -344,6 +344,10 @@
       "name": "Register real bill",
       "description": "Stores a received bill's data.",
       "fields": {
+        "fecha_inicio": {
+          "name": "First day of the period",
+          "description": "If set, the cycle lasts exactly the days billed."
+        },
         "fecha_fin": {
           "name": "Last day of the period",
           "description": ""
@@ -407,6 +411,24 @@
         "valor": {
           "name": "Value",
           "description": ""
+        }
+      }
+    },
+    "importar_factura_pdf": {
+      "name": "Import invoice PDF",
+      "description": "Reads an electricity invoice PDF (base64), registers its figures and the cycle with the days billed, and updates the tariff if prices changed. The PDF is not stored.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": ""
+        },
+        "contenido": {
+          "name": "PDF as base64",
+          "description": ""
+        },
+        "actualizar_tarifa": {
+          "name": "Update tariff",
+          "description": "Apply the invoice prices when they differ from the stored ones."
         }
       }
     }
