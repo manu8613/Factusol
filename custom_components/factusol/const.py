@@ -79,6 +79,7 @@ DEFAULT_CYCLE_DAY: Final = 1
 
 TICK: Final = timedelta(seconds=30)
 STORAGE_VERSION: Final = 1
+MAX_PDF_B64_CHARS: Final = 7_000_000  # un PDF de 5 MB en base64
 MAX_CSV_CHARS: Final = 8_000_000  # un año de CSV horario ocupa menos de 1 MB
 MAX_GAP_HOURS: Final = 24 * 14  # un hueco mayor se reparte igualmente, pero se avisa
 
@@ -94,6 +95,7 @@ SERVICE_IMPORT: Final = "importar_datos_distribuidora"
 SERVICE_CALIBRATE: Final = "calibrar"
 SERVICE_REBUILD: Final = "reconstruir_historial"
 SERVICE_REGISTER_BILL: Final = "registrar_factura"
+SERVICE_IMPORT_INVOICE: Final = "importar_factura_pdf"
 SERVICE_SET_HUCHA: Final = "ajustar_hucha"
 SERVICE_SET_FIXED: Final = "ajustar_costes_fijos"
 

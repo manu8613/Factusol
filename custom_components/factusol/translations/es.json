@@ -344,6 +344,10 @@
       "name": "Registrar factura real",
       "description": "Guarda los datos de una factura recibida: sustituyen a la estimación y fijan el saldo de la hucha.",
       "fields": {
+        "fecha_inicio": {
+          "name": "Primer día del periodo",
+          "description": "Si lo indicas, el ciclo dura exactamente los días de la factura."
+        },
         "fecha_fin": {
           "name": "Último día del periodo",
           "description": ""
@@ -407,6 +411,24 @@
         "valor": {
           "name": "Valor",
           "description": ""
+        }
+      }
+    },
+    "importar_factura_pdf": {
+      "name": "Importar factura en PDF",
+      "description": "Lee una factura de luz en PDF (en base64), registra sus datos y el ciclo con los días cobrados, y actualiza la tarifa si los precios cambian. El PDF no se guarda.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": ""
+        },
+        "contenido": {
+          "name": "PDF en base64",
+          "description": ""
+        },
+        "actualizar_tarifa": {
+          "name": "Actualizar tarifa",
+          "description": "Aplica los precios de la factura si difieren de los guardados."
         }
       }
     }
