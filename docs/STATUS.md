@@ -1,6 +1,6 @@
 # Estado
 
-Versión: v0.2.1 (rama `fix/historial-facturas`, en PR) · Publicada: v0.2.0 · Actualizado: 2026-11-11
+Versión: v0.3.0 (rama `feat/historico-precios`, en PR) · Publicada: v0.2.1 · Actualizado: 2026-11-13
 
 ## Funciona (comprobado)
 - Motor de facturación 2.0TD: reproduce al céntimo dos facturas reales de autoconsumo con hucha (importe a pagar, ingreso en la hucha y saldo).
@@ -33,6 +33,13 @@ Versión: v0.2.1 (rama `fix/historial-facturas`, en PR) · Publicada: v0.2.0 · 
 - Pendientes: ver arriba. Próximo paso: configurarla en la instalación real y migrar las plantillas actuales.
 
 ## Último cierre
+**Factusol · feat/historico-precios · v0.3.0**
+- Objetivo: avisar si una factura cambia el precio de la potencia o de los periodos y guardar el histórico de precios por factura.
+- Cambios: `prices.py` (comparación e histórico, sin Home Assistant), `async_import_invoice` guarda `precios` en cada factura, compara con la anterior (o con la tarifa) y devuelve `cambios_precio`; notificación al cambiar; sensores Alerta de precios e Historial de precios; traducciones, README y CHANGELOG.
+- Pruebas: 65 en verde (8 nuevas) y ruff limpio.
+- Pendientes: reimportar los PDF de agosto y septiembre para sembrar el histórico; probar en la instalación real con la factura de octubre.
+
+### Anterior
 **Factusol · feat/factura-pdf · v0.2.0**
 - Objetivo: importar facturas de luz en PDF y calcular los ciclos por los días cobrados.
 - Cambios: `invoice.py` (lector, sin Home Assistant), servicio `importar_factura_pdf`, `fecha_inicio` en `registrar_factura`, ciclos con fin real de factura en `_build_chain`, tarifa automática, `pypdf>=6.21.4`, traducciones y tests con facturas sintéticas.

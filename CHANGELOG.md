@@ -2,6 +2,11 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiones: [SemVer](https://semver.org/lang/es/).
 
+## [0.3.0] - 2026-11-13
+- Cada factura en PDF que se importa guarda los precios que cobra (potencia punta y valle, potencia contratada, energía punta, llano y valle, compensación de excedentes, bono social y alquiler del equipo) y los compara con los de la factura anterior; si no hay ninguna registrada con precios, con la tarifa configurada. La respuesta de `importar_factura_pdf` incluye `cambios_precio` (campo, antes, después y variación en %) y `referencia_precios`.
+- Si la factura más reciente cambia algún precio, se crea una notificación en Home Assistant con el detalle; si no cambia ninguno, se retira. Importar una factura antigua no avisa.
+- Dos sensores nuevos: **Alerta de precios** (número de precios que cambian en la última factura, con el detalle en los atributos) e **Historial de precios** (precios y cambios de cada factura, de la más antigua a la más reciente). Las facturas registradas antes de esta versión no tienen precios: vuelve a importar su PDF para que entren en el histórico.
+
 ## [0.2.1] - 2026-11-11
 - El historial de facturas incluye también las facturas registradas anteriores al saldo inicial de la hucha (antes se guardaban pero no se veían).
 

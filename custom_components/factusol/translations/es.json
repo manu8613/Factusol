@@ -206,6 +206,12 @@
       },
       "ultimo_dato_oficial": {
         "name": "Último dato oficial"
+      },
+      "alerta_precios": {
+        "name": "Alerta de precios"
+      },
+      "historial_precios": {
+        "name": "Historial de precios"
       }
     },
     "number": {
@@ -416,7 +422,7 @@
     },
     "importar_factura_pdf": {
       "name": "Importar factura en PDF",
-      "description": "Lee una factura de luz en PDF (en base64), registra sus datos y el ciclo con los días cobrados, y actualiza la tarifa si los precios cambian. El PDF no se guarda.",
+      "description": "Lee una factura de luz en PDF (en base64), registra sus datos y el ciclo con los días cobrados, avisa si cambian los precios respecto a la factura anterior y actualiza la tarifa. El PDF no se guarda.",
       "fields": {
         "config_entry_id": {
           "name": "Entry",

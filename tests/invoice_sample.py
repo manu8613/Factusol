@@ -8,6 +8,7 @@ def sample_invoice(
     end: str = "14/10/2026",
     days: int = 14,
     price_peak: str = "0,196495",
+    power_peak: str = "0,091074",
     surplus: bool = True,
 ) -> str:
     solar = (
@@ -26,7 +27,7 @@ RESUMEN DE FACTURA
 PERIODO DE FACTURACIÓN: Nº FACTURA:
 {prev_end} - {end} 000000000000000000
 DETALLE DE FACTURA
-Potencia facturada Punta 4,6 kW x {days} días x 0,091074 €/kW día 5,87 €
+Potencia facturada Punta 4,6 kW x {days} días x {power_peak} €/kW día 5,87 €
 Valle 4,6 kW x {days} días x 0,013483 €/kW día 0,87 €
 Energía consumida Punta 3,00 kWh x {price_peak} €/kWh 0,59 €
 Llano 2,00 kWh x 0,138209 €/kWh 0,28 €

@@ -21,6 +21,7 @@ from homeassistant.helpers.typing import StateType
 from .entity import FactusolEntity
 from .hours import eh_start
 from .manager import FactusolConfigEntry, FactusolManager, Snapshot
+from .prices import last_change, price_history
 from .schedule import LLANO, PUNTA, VALLE
 
 EUR = "€"
@@ -52,6 +53,21 @@ def _bill_attrs(m: FactusolManager, s: Snapshot) -> dict[str, Any]:
         "importacion_bruta_kwh": _round(c.totals.importacion_bruta_kwh, 3),
         "exportacion_bruta_kwh": _round(c.totals.exportacion_bruta_kwh, 3),
     }
+
+
+def _price_alert_attrs(m: FactusolManager, s: Snapshot) -> dict[str, Any]:
+    history = price_history(m.invoices)
+    change = last_change(history)
+    return {
+        "hay_cambios": change is not None,
+        "factura_inicio": history[-1]["inicio"] if history else None,
+        "factura_fin": history[-1]["fin"] if history else None,
+        "cambios": change["cambios"] if change else [],
+    }
+
+
+def _price_history_attrs(m: FactusolManager, s: Snapshot) -> dict[str, Any]:
+    return {"facturas": price_history(m.invoices)}
 
 
 def _history(m: FactusolManager, s: Snapshot) -> dict[str, Any]:
@@ -236,6 +252,16 @@ SENSORS: tuple[FactusolSensorDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda m, s: len(s.cycles),
         attr_fn=_history,
+    ),
+    FactusolSensorDescription(
+        key="alerta_precios",
+        value_fn=lambda m, s: len(c["cambios"]) if (c := last_change(price_history(m.invoices))) else 0,
+        attr_fn=_price_alert_attrs,
+    ),
+    FactusolSensorDescription(
+        key="historial_precios",
+        value_fn=lambda m, s: len(price_history(m.invoices)),
+        attr_fn=_price_history_attrs,
     ),
     FactusolSensorDescription(
         key="costes_fijos",

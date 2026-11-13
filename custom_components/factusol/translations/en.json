@@ -206,6 +206,12 @@
       },
       "ultimo_dato_oficial": {
         "name": "Last official data"
+      },
+      "alerta_precios": {
+        "name": "Price alert"
+      },
+      "historial_precios": {
+        "name": "Price history"
       }
     },
     "number": {
@@ -416,7 +422,7 @@
     },
     "importar_factura_pdf": {
       "name": "Import invoice PDF",
-      "description": "Reads an electricity invoice PDF (base64), registers its figures and the cycle with the days billed, and updates the tariff if prices changed. The PDF is not stored.",
+      "description": "Reads an electricity invoice PDF (base64), registers its figures and the cycle with the days billed, flags price changes against the previous invoice and updates the tariff if prices changed. The PDF is not stored.",
       "fields": {
         "config_entry_id": {
           "name": "Entry",
