@@ -9,6 +9,7 @@ def sample_invoice(
     days: int = 14,
     price_peak: str = "0,196495",
     power_peak: str = "0,091074",
+    vat_label: str = "IVA",
     surplus: bool = True,
 ) -> str:
     solar = (
@@ -37,6 +38,6 @@ Total 12,00 kWh hasta {end} 1,60 €
 Impuesto sobre electricidad 5,11269632 % s/7,87 € 0,40 €
 Alquiler equipos medida {days} días x 0,02663 €/día 0,37 €
 IMPORTE TOTAL 8,00 €
-IVA 21 % s/8,00 € 1,68 €
+{vat_label} 21 % s/8,00 € 1,68 €
 TOTAL IMPORTE FACTURA 0,00 €
 """

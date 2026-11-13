@@ -16,6 +16,8 @@ PRICE_FIELDS: Final[dict[str, tuple[str, str]]] = {
     "precio_excedentes": ("Compensación de excedentes", "€/kWh"),
     "bono_social_dia": ("Bono social", "€/día"),
     "alquiler_dia": ("Alquiler del equipo de medida", "€/día"),
+    "impuesto_electrico": ("Impuesto eléctrico", "%"),
+    "iva": ("IVA", "%"),
 }
 _EPS: Final = 1e-9
 

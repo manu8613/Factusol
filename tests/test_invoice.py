@@ -74,3 +74,11 @@ def test_pdf_limits():
         extract_text(b"hola")
     with pytest.raises(InvoiceError, match="grande"):
         extract_text(b"%PDF-" + b"0" * 5_000_001)
+
+
+@pytest.mark.parametrize("label", ["IVA", "IVA (*)", "IVA Reducido (*)"])
+def test_vat_line_variants(label):
+    """El IVA sale como «IVA», «IVA (*)» o «IVA Reducido (*)» según el periodo."""
+    p = parse_invoice(sample_invoice(vat_label=label))
+    assert p.factura["total_bruto"] == 9.68
+    assert p.tarifa["iva"] == 21.0
