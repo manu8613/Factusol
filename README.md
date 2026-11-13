@@ -66,7 +66,7 @@ Los ciclos siguen los días que cobró cada factura: si la factura va del 15 al 
 
 ## Cambios de precio en las facturas
 
-Al importar cada PDF, Factusol guarda los precios de esa factura y los compara con los de la anterior (o con la tarifa configurada si es la primera): potencia punta y valle, potencia contratada, energía punta, llano y valle, compensación de excedentes, bono social y alquiler del equipo de medida. Si alguno cambia, el servicio lo devuelve en `cambios_precio`, se crea una notificación y el sensor **Alerta de precios** pasa a mostrar cuántos han cambiado (el detalle va en sus atributos). El sensor **Historial de precios** guarda los precios de todas las facturas importadas. Las facturas registradas antes de la 0.3.0 no tienen precios: vuelve a importar su PDF para completar el histórico.
+Al importar cada PDF, Factusol guarda los precios de esa factura y los compara con los de la anterior (o con la tarifa configurada si es la primera): potencia punta y valle, potencia contratada, energía punta, llano y valle, compensación de excedentes, bono social, alquiler del equipo de medida, impuesto eléctrico e IVA. Si alguno cambia, el servicio lo devuelve en `cambios_precio`, se crea una notificación y el sensor **Alerta de precios** pasa a mostrar cuántos han cambiado (el detalle va en sus atributos). El sensor **Historial de precios** guarda los precios de todas las facturas importadas. Las facturas registradas antes de la 0.3.0 no tienen precios: vuelve a importar su PDF para completar el histórico.
 
 ## Registrar una factura real
 

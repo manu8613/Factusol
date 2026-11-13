@@ -1,6 +1,6 @@
 # Estado
 
-Versión: v0.3.0 (rama `feat/historico-precios`, en PR) · Publicada: v0.2.1 · Actualizado: 2026-11-13
+Versión: v0.3.1 (rama `fix/iva-reducido`, en PR) · Publicada: v0.3.0 · Actualizado: 2026-11-13
 
 ## Funciona (comprobado)
 - Motor de facturación 2.0TD: reproduce al céntimo dos facturas reales de autoconsumo con hucha (importe a pagar, ingreso en la hucha y saldo).
@@ -33,6 +33,13 @@ Versión: v0.3.0 (rama `feat/historico-precios`, en PR) · Publicada: v0.2.1 · 
 - Pendientes: ver arriba. Próximo paso: configurarla en la instalación real y migrar las plantillas actuales.
 
 ## Último cierre
+**Factusol · fix/iva-reducido · v0.3.1**
+- Objetivo: que el lector de PDF acepte las facturas cuyo IVA aparece como «IVA (*)» o «IVA Reducido (*)» (tres facturas reales se rechazaban con «No encuentro el importe total y el IVA»).
+- Cambios: patrón común del IVA en `invoice.py`; IVA e impuesto eléctrico entran en el aviso y el histórico de precios; README y CHANGELOG.
+- Pruebas: 68 en verde (3 nuevas, con importes sintéticos) y ruff limpio; las tres facturas reales se leen y sus totales cuadran.
+- Pendientes: volver a subir esas tres facturas (y agosto y septiembre) tras actualizar; faltan las de junio y julio para un histórico sin huecos.
+
+### Anterior
 **Factusol · feat/historico-precios · v0.3.0**
 - Objetivo: avisar si una factura cambia el precio de la potencia o de los periodos y guardar el histórico de precios por factura.
 - Cambios: `prices.py` (comparación e histórico, sin Home Assistant), `async_import_invoice` guarda `precios` en cada factura, compara con la anterior (o con la tarifa) y devuelve `cambios_precio`; notificación al cambiar; sensores Alerta de precios e Historial de precios; traducciones, README y CHANGELOG.

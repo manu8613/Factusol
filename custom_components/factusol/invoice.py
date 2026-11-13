@@ -20,6 +20,7 @@ MAX_PDF_PAGES = 12
 
 _NUM = r"(?:-?\d{1,3}(?:\.\d{3})*(?:,\d+)?|-?\d+(?:,\d+)?)"
 _DATE = r"(\d{2})/(\d{2})/(\d{4})"
+_VAT = r"IVA(?: Reducido)?(?: \(\*\))?"  # «IVA 21 %», «IVA Reducido (*) 10 %», «IVA (*) 21 %»
 
 
 class InvoiceError(ValueError):
@@ -111,7 +112,7 @@ def parse_invoice(text: str) -> ParsedInvoice:
         t["alquiler_dia"] = _n(m.group(2))
     if m := re.search(rf"Impuesto sobre electricidad ({_NUM}) %", flat):
         t["impuesto_electrico"] = _n(m.group(1))
-    if m := re.search(rf"IVA ({_NUM}) % s/", flat):
+    if m := re.search(rf"{_VAT} ({_NUM}) % s/", flat):
         t["iva"] = _n(m.group(1))
     # Excedentes
     if m := re.search(rf"energ[ií]a excedentaria del [úu]ltimo mes es ({_NUM}) kWh", flat):
@@ -120,7 +121,7 @@ def parse_invoice(text: str) -> ParsedInvoice:
         t["precio_excedentes"] = _n(m.group(1))
     # Totales
     total = re.search(rf"IMPORTE TOTAL ({_NUM}) €", flat)
-    iva = re.search(rf"IVA {_NUM} % s/{_NUM} € ({_NUM}) €", flat)
+    iva = re.search(rf"{_VAT} {_NUM} % s/{_NUM} € ({_NUM}) €", flat)
     if not total or not iva:
         raise InvoiceError("No encuentro el importe total y el IVA de la factura")
     f["total_bruto"] = round(_n(total.group(1)) + _n(iva.group(1)), 2)

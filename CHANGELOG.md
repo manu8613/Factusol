@@ -2,6 +2,10 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) · Versiones: [SemVer](https://semver.org/lang/es/).
 
+## [0.3.1] - 2026-11-13
+- El lector de facturas en PDF reconoce la línea de IVA con las etiquetas «IVA (*)» e «IVA Reducido (*)», que aparecen cuando el tipo de IVA cambia (antes rechazaba esas facturas con «No encuentro el importe total y el IVA»).
+- El aviso y el histórico de precios incluyen también el IVA y el impuesto eléctrico.
+
 ## [0.3.0] - 2026-11-13
 - Cada factura en PDF que se importa guarda los precios que cobra (potencia punta y valle, potencia contratada, energía punta, llano y valle, compensación de excedentes, bono social y alquiler del equipo) y los compara con los de la factura anterior; si no hay ninguna registrada con precios, con la tarifa configurada. La respuesta de `importar_factura_pdf` incluye `cambios_precio` (campo, antes, después y variación en %) y `referencia_precios`.
 - Si la factura más reciente cambia algún precio, se crea una notificación en Home Assistant con el detalle; si no cambia ninguno, se retira. Importar una factura antigua no avisa.

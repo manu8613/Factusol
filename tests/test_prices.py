@@ -8,7 +8,7 @@ BASE = {"precio_punta": 0.2, "precio_llano": 0.14, "precio_potencia_punta": 0.09
 
 
 def test_keep_prices_filters_and_floats():
-    assert keep_prices({"precio_punta": 1, "iva": 21, "precio_llano": None}) == {"precio_punta": 1.0}
+    assert keep_prices({"precio_punta": 1, "otro": 21, "precio_llano": None}) == {"precio_punta": 1.0}
 
 
 def test_diff_detects_only_real_changes():
