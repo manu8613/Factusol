@@ -406,3 +406,55 @@ async def test_history_lists_invoices_older_than_the_initial_balance(hass: HomeA
     assert months[0]["total_bruto"] == 20.95 and months[0]["consumo_kwh"] == 36.49
     assert months[0]["coste_real"] == pytest.approx(-10.76)
     assert months[1]["ciclo"] == "2026-10-01"
+
+
+async def _import_sample(hass: HomeAssistant, **kwargs):
+    from tests.invoice_sample import sample_invoice
+
+    with patch("custom_components.factusol.manager.extract_text", return_value=sample_invoice(**kwargs)):
+        return await hass.services.async_call(
+            DOMAIN, "importar_factura_pdf", {"contenido": _pdf_b64()}, blocking=True, return_response=True
+        )
+
+
+async def test_price_change_is_detected_alerted_and_listed(hass: HomeAssistant) -> None:
+    entry = await _setup(hass)
+    first = await _import_sample(hass)
+    assert first["referencia_precios"] == "tarifa" and first["cambios_precio"] == []
+    with patch("custom_components.factusol.manager.persistent_notification.async_create") as notify:
+        second = await _import_sample(
+            hass, prev_end="14/10/2026", end="31/10/2026", days=17, price_peak="0,210000", power_peak="0,100000"
+        )
+    assert second["referencia_precios"] == "factura_anterior"
+    assert {c["campo"] for c in second["cambios_precio"]} == {"precio_punta", "precio_potencia_punta"}
+    notify.assert_called_once()
+    assert "Energía punta" in notify.call_args.args[1] and "Potencia punta" in notify.call_args.args[1]
+    await hass.async_block_till_done()
+    alert = _sensor(hass, entry, "alerta_precios")
+    assert alert.state == "2" and alert.attributes["hay_cambios"] is True
+    assert alert.attributes["factura_inicio"] == "2026-10-15"
+    facturas = _sensor(hass, entry, "historial_precios").attributes["facturas"]
+    assert [f["inicio"] for f in facturas] == ["2026-10-01", "2026-10-15"]
+    assert facturas[1]["cambios"][0]["antes"] != facturas[1]["cambios"][0]["despues"]
+
+
+async def test_no_price_change_clears_the_alert(hass: HomeAssistant) -> None:
+    entry = await _setup(hass)
+    await _import_sample(hass)
+    with patch("custom_components.factusol.manager.persistent_notification.async_dismiss") as dismiss:
+        result = await _import_sample(hass, prev_end="14/10/2026", end="31/10/2026", days=17)
+    assert result["cambios_precio"] == []
+    dismiss.assert_called_once()
+    assert _sensor(hass, entry, "alerta_precios").state == "0"
+
+
+async def test_old_invoice_import_does_not_notify(hass: HomeAssistant) -> None:
+    await _setup(hass)
+    await _import_sample(hass, prev_end="14/10/2026", end="31/10/2026", days=17)
+    with (
+        patch("custom_components.factusol.manager.persistent_notification.async_create") as create,
+        patch("custom_components.factusol.manager.persistent_notification.async_dismiss") as dismiss,
+    ):
+        await _import_sample(hass, price_peak="0,300000")  # una anterior: no es la más reciente
+    create.assert_not_called()
+    dismiss.assert_not_called()

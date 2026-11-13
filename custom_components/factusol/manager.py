@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
@@ -56,6 +57,7 @@ from .ledger import (
     Ledger,
     aggregate_cycle,
 )
+from .prices import describe_changes, diff_prices, keep_prices
 from .schedule import LLANO, PUNTA, VALLE, parse_extra_holidays, period_of
 
 _LOGGER = logging.getLogger(__name__)
@@ -449,6 +451,20 @@ class FactusolManager(DataUpdateCoordinator[Snapshot]):
             out["aviso"] = "Es anterior al saldo inicial de la hucha: se guarda, pero no cambia el cálculo actual"
         return out
 
+    def _price_baseline(self, start: date) -> tuple[dict[str, Any], str]:
+        """Precios con los que comparar una factura que empieza en ``start``.
+
+        La factura anterior ya registrada con precios; si no hay ninguna, la tarifa configurada
+        que regía el día anterior.
+        """
+        earlier = [k for k, rec in self.invoices.items() if k < start.isoformat() and rec.get("precios")]
+        if earlier:
+            return dict(self.invoices[max(earlier)]["precios"]), "factura_anterior"
+        eligible = [t for t in self.tariff_dicts if t[T_FROM] < start.isoformat()]
+        if eligible:
+            return keep_prices(max(eligible, key=lambda t: t[T_FROM])), "tarifa"
+        return {}, "tarifa"
+
     async def async_import_invoice(self, content: str, apply_tariff: bool = True) -> dict[str, Any]:
         """Lee una factura en PDF (base64), la registra y, si hace falta, actualiza la tarifa.
 
@@ -464,21 +480,41 @@ class FactusolManager(DataUpdateCoordinator[Snapshot]):
         except InvoiceError as err:
             raise HomeAssistantError(str(err)) from err
         del raw, text
-        result = await self.async_register_bill(parsed.fin, dict(parsed.factura), start=parsed.inicio)
+        prices = keep_prices(parsed.tarifa)
+        before, reference = self._price_baseline(parsed.inicio)
+        price_changes = diff_prices(before, prices) if before else []
+        result = await self.async_register_bill(
+            parsed.fin, {**parsed.factura, "precios": prices} if prices else dict(parsed.factura), start=parsed.inicio
+        )
         out: dict[str, Any] = {"periodo": as_service_data(parsed), **result}
+        if before:
+            out["referencia_precios"] = reference
+            out["cambios_precio"] = price_changes
+        if prices and max(self.invoices) == parsed.inicio.isoformat():  # solo la factura más reciente avisa
+            if price_changes:
+                persistent_notification.async_create(
+                    self.hass,
+                    f"La factura del {parsed.inicio:%d/%m/%Y} al {parsed.fin:%d/%m/%Y} cambia estos precios "
+                    f"respecto a {'la factura anterior' if reference == 'factura_anterior' else 'la tarifa configurada'}:\n\n"
+                    f"{describe_changes(price_changes)}",
+                    title="Factusol: cambio de precios en la factura",
+                    notification_id=f"{DOMAIN}_cambio_precios",
+                )
+            else:
+                persistent_notification.async_dismiss(self.hass, f"{DOMAIN}_cambio_precios")
         if parsed.avisos:
             out["avisos"] = list(parsed.avisos)
         if apply_tariff and parsed.tarifa:
             eligible = [t for t in self.tariff_dicts if t[T_FROM] <= parsed.inicio.isoformat()]
             current = max(eligible, key=lambda t: t[T_FROM]) if eligible else None
-            changes = {
+            tariff_changes = {
                 k: v
                 for k, v in parsed.tarifa.items()
                 if current is None or abs(float(current.get(k, 0.0)) - v) > 1e-9
             }
-            if changes:
-                out["tarifa_actualizada"] = changes
-                await self.async_new_tariff(parsed.inicio, changes)  # recarga la integración: va el último
+            if tariff_changes:
+                out["tarifa_actualizada"] = tariff_changes
+                await self.async_new_tariff(parsed.inicio, tariff_changes)  # recarga la integración: va el último
         return out
 
     async def async_import_official(self, path: str | None = None, content: str | None = None) -> dict[str, Any]:

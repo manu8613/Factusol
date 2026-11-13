@@ -64,6 +64,10 @@ El dato oficial suele tardar uno o dos días: las horas sin dato oficial se calc
 
 Los ciclos siguen los días que cobró cada factura: si la factura va del 15 al 14, ese ciclo dura exactamente esos días y el siguiente empieza el 15. También puedes indicarlo a mano con `fecha_inicio` en `registrar_factura`.
 
+## Cambios de precio en las facturas
+
+Al importar cada PDF, Factusol guarda los precios de esa factura y los compara con los de la anterior (o con la tarifa configurada si es la primera): potencia punta y valle, potencia contratada, energía punta, llano y valle, compensación de excedentes, bono social y alquiler del equipo de medida. Si alguno cambia, el servicio lo devuelve en `cambios_precio`, se crea una notificación y el sensor **Alerta de precios** pasa a mostrar cuántos han cambiado (el detalle va en sus atributos). El sensor **Historial de precios** guarda los precios de todas las facturas importadas. Las facturas registradas antes de la 0.3.0 no tienen precios: vuelve a importar su PDF para completar el histórico.
+
 ## Registrar una factura real
 
 Cuando llegue la factura, `factusol.registrar_factura` guarda sus importes (total bruto, hucha aplicada, importe almacenado, saldo final y kWh). Sustituyen a la estimación de ese ciclo, fijan el saldo de la hucha para los siguientes y el servicio devuelve la desviación entre lo estimado y lo real.
